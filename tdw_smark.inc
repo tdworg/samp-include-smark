@@ -90,9 +90,7 @@ static stock const
 	TDW_g_sNullGroup[BenchmarkGroup];
 
 static stock
-	TDW_g_sStaticMsg = 0;
-
-stock
+	TDW_g_sStaticMsg = 0,
 	TDW_g_sGroup[_BENCHMARK_MAX_ITEMS][BenchmarkGroup];
 
 forward bool:benchmark_group_init();
