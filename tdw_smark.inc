@@ -4,7 +4,7 @@
 | Description:
 
 | Version:
-	1.0.0
+	1.0.1
 
 | Dependencies:
 	- n\a
@@ -63,19 +63,23 @@
 #define BENCHMARK_MAJOR=UNTAG(-1) BENCHMARK_MAJOR=UNTAG(_BENCHMARK_DEFAULT_MAJOR)
 #define BENCHMARK_MINOR=UNTAG(-1) BENCHMARK_MINOR=UNTAG(_BENCHMARK_DEFAULT_MINOR)
 
+#define BENCHMARK_CHECK_VARS:%0,; %0;
+#define bml@%0\32; bml@%0
+
 #define BENCHMARK_GROUP(%1)\
 	for (new bool:bml@once=benchmark_group_init(), bml@i, bml@t, bml@c, bml@mj, bml@mi = _:BENCHMARK_CHECK_VARS:0, %1;\
 		bml@once;\
 		benchmark_group_end(bml@c, BENCHMARK_MAJOR, BENCHMARK_MINOR), bml@once=false)\
 		for( ; bml@mj < BENCHMARK_MAJOR; ++bml@mj, bml@i = 0)
-#define BENCHMARK_CHECK_VARS:%0,; %0;
-#define bml@%0\32; bml@%0
-
 #define BENCHMARK_ITEM(%1)\
 	for (bml@once = benchmark_item_init(#%1, bml@mj, bml@i, bml@c);\
 		bml@once;\
 		benchmark_item_end(GetTickCount()-bml@t, bml@i), bml@once=false)\
 		for(bml@mi=0,bml@t=GetTickCount(); bml@mi < BENCHMARK_MINOR; ++bml@mi)
+#define DISABLE_BENCHMARK_GROUP(%1)\
+	for (new bool:bml@once=false, bml@i, bml@t, bml@c, bml@mj, bml@mi = _:BENCHMARK_CHECK_VARS:0, %1;\
+		bml@once;\
+		bml@once=false)
 
 enum BenchmarkGroup {
 	EI_BM_NAME[_BENCHMARK_MAX_ITEM_NAME],
@@ -96,9 +100,17 @@ forward bool:benchmark_item_init(const name[], major_it, index, &count);
 
 static stock benchmark_show_static_msg()
 {
+	static const mode_msg[2][] = {"interpreted", "JIT-compilation"};
+	new jit;
+	#emit lctrl 7
+	#emit stor.s.pri jit
+
 	print(!" |==============================================|");
 	print(!" | Benchmarks                                   |");
 	print(!" |==============================================|");
+	print(!" |                                              |");
+	printf(" | Mode: %32s       |", mode_msg[jit]);
+	print(!" |                                              |");
 }
 
 stock bool:benchmark_group_init()
@@ -139,8 +151,6 @@ stock benchmark_item_end(diff, &index)
 
 stock benchmark_group_end(count, major_it, minor_it)
 {
-	#pragma unused major_it, minor_it
-
 	new fastid, lasttime = TDW_g_sGroup[0][EI_BM_AVERAGE_TIME];
 
 	print(!" | Name                             | Time (ms) |");
@@ -161,7 +171,8 @@ stock benchmark_group_end(count, major_it, minor_it)
 	}
 
 	print(!" |----------------------------------|-----------|");
-	printf(" | %2d parts                                     |", count);
+	printf(" | %02d parts                                     |", count);
+	printf(" | %011d iterations                       |", major_it * minor_it);
 	print(!" |                                              |");
 	print(!" |-----                End                ------|");
 	print(!" |                                              |");

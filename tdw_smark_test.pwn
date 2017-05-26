@@ -2,11 +2,11 @@
 
 #include "tdw_smark\tdw_smark.inc"
 
-BENCHMARK_INIT(-1, -1 , true);
+BENCHMARK_INIT(-1, -1, true);
 
 main()
 {
-	BENCHMARK_GROUP(abc[100])
+	DISABLE_BENCHMARK_GROUP(abc[100])
 	{
 		BENCHMARK_ITEM(format)
 		{
