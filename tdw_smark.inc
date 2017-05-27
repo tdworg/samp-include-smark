@@ -168,9 +168,11 @@ stock benchmark_group_end(count, major_it, minor_it)
 			TDW_g_sGroup[i][EI_BM_NAME], TDW_g_sGroup[i][EI_BM_AVERAGE_TIME]);
 	}
 
+	new citers = major_it * minor_it;
+
 	print(!" |----------------------------------|-----------|");
-	printf(" | %02d parts                                     |", count);
-	printf(" | %011d iterations                       |", major_it * minor_it);
+	printf(" | %02d part%c                                     |", count, (count > 1 ? 's' : ' '));
+	printf(" | %011d iteration%c                       |", citers, (citers > 1 ? 's' : ' '));
 	print(!" |                                              |");
 	print(!" |-----                End                ------|");
 	print(!" |                                              |");
